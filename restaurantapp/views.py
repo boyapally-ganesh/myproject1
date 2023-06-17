@@ -8,41 +8,13 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 def restaurant_list(request):
-    # location = request.GET.get('location')
-    # veg_or_nonveg = request.GET.get('veg_or_nonveg')
-    # cuisines = request.GET.getlist('cuisines')
-    # open_or_close = request.GET.get('open_or_close')
+    
     restaurants = Restaurant.objects.all()
-    # if location:
-    #     restaurants = restaurants.filter(location=location)
-    # if veg_or_nonveg:
-    #     restaurants = restaurants.filter(veg_or_nonveg=veg_or_nonveg)
-    # if cuisines:
-    #     restaurants = restaurants.filter(cuisines__in=cuisines)
-    # if open_or_close:
-    #     restaurants = restaurants.filter(open_or_close=open_or_close)
+
     context = {'restaurants': restaurants}
     return render(request, 'restaurant_list.html', context)
 
-# def restaurant_detail(request, slug):
-#     if(Restaurant.objects.filter(slug=slug)):
-#         restaurants = Restaurant.objects.filter(slug=slug).first()
-#         context = {
-#             'restaurants':restaurants
-#         }
-#         return render(request, 'restaurant_detail.html',context)
-    
-#     else:
-#         return redirect('restaurants/')
-#     # context = {'restaurant': restaurant}
-#     return render(request, 'restaurant_detail.html', context)
-# def restaurant_detail(request, slug):
-#     restaurant = Restaurant.objects.filter(slug=slug).first()
-#     if restaurant:
-#         context = {'restaurant': restaurant}
-#         return render(request, 'restaurant_detail.html', context)
-#     else:
-#         return redirect('restaurant_list')
+
 # this is main.............................
 def bookmark_add(request, restaurant_id):
     restaurant = get_object_or_404(Restaurant, id=restaurant_id)
@@ -50,15 +22,12 @@ def bookmark_add(request, restaurant_id):
     if created:
         print("add sucessfully")
 
-        # Bookmark was added
-        # Add any additional logic or messages here
-        # return redirect('restaurant_detail', slug=restaurant.slug)
+       
         return JsonResponse({'status': 'Bookmark added successfully'})
     else:
-        # Bookmark already exists
-        # Add any additional logic or messages here
+      
         print("Bookmark already exists")
-        # return redirect('restaurant_detail', slug=restaurant.slug)
+      
         return JsonResponse({'status': 'Bookmark allready'})
 
 def mark_visited(request, restaurant_id):
@@ -97,17 +66,6 @@ def restaurant_detail(request, slug):
     else:
         form = ReviewForm()
 
-    # Get the reviews for the restaurant
-   
-   
-       
-        
-
-        
-        # Redirect to the restaurant detail page
-    
-    
-    # Get the reviews for the restaurant
     reviews = Review.objects.filter(restaurant=restaurant)
     context = {
         'restaurant': restaurant,
@@ -202,29 +160,20 @@ def add_review(request, slug):
 
     return render(request, 'add_review.html', context)
 
-# def delete_review(request, slug, review_id):
-#     review = get_object_or_404(Review, id=review_id)
-#     # Perform any necessary checks or validations
-#     if request.method == 'POST':
-#         # Delete the review
-#         review.delete()
-#     # Redirect to the restaurant detail page
-#     return redirect('restaurantapp:restaurant_detail', slug=slug)
 @login_required
 def delete_review(request, slug, review_id):
-    # Retrieve the review object
+
     review = get_object_or_404(Review, id=review_id)
 
-    # Check if the logged-in user is the owner of the review
+
     if review.user != request.user:
-        # User is not the owner, return an error response or redirect to an appropriate page
-        # For example, you can redirect back to the restaurant detail page
+       
         return redirect('restaurantapp:restaurant_detail', slug=slug)
 
-    # Delete the review
+
     review.delete()
 
-    # Redirect to the restaurant detail page
+
     return redirect('restaurantapp:restaurant_detail', slug=slug)
 
 
