@@ -1,15 +1,5 @@
-# from django.urls import path
-# from . import views
 
 
-# app_name = 'restaurantapp'
-
-# urlpatterns = [
-#     path('restaurants/', views.restaurant_list, name='restaurant_list'),
-#     # path('restaurants/<str:slug>/', views.restaurant_detail, name='details'),
-#     path('restaurants/<str:slug>/', views.restaurant_detail, name='restaurant_detail'),
-#     path('restaurants/<int:restaurant_id>/bookmark/', views.bookmark_add, name='bookmark_adds'),
-# ]
 from django.urls import path
 from . import views
 from . import consumers
