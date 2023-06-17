@@ -1,0 +1,131 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<style>
+    .card-img-top{
+        height: 400px;
+    }
+</style>
+<div class="container mt-4">
+    
+    <div class="card" >
+        <img src="{{ restaurant.restaurant_photo_home.url }}" class="card-img-top" alt="Restaurant Photo">
+
+        <!-- <div class="card-body">
+          <h5 class="card-title">{{restaurant.title}}</h5>
+          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+        </div> -->
+        <!-- <ul class="list-group list-group-flush">
+          <li class="list-group-item">An item</li>
+          <li class="list-group-item">A second item</li>
+          <li class="list-group-item">A third item</li>
+        </ul> -->
+        <!-- <div class="card-body">
+          <a href="#" class="card-link">Card link</a>
+          <a href="#" class="card-link">Another link</a>
+        </div> -->
+      </div>
+      <div class="d-flex justify-content-between">
+
+          <h1 class="h2 mt-2">{{restaurant.title}}</h1>
+          <div class="">
+            {% if restaurant.rating < 1 %}
+              <span class="badge text-bg-danger h2">{{ restaurant.rating }}<i class="fa-solid fa-star text-light"></i></span>
+            {% else %}
+              <span class="badge text-bg-success h2">{{ restaurant.rating }}<i class="fa-solid fa-star text-light"></i></span>
+            {% endif %}
+          </div>
+          
+      </div>
+      <p>{{restaurant.cuisines.name}}</p>
+      <p><b>Location: </b>({{restaurant.location}}), </p>
+      <p><b>Address: </b>({{restaurant.address}})</p>
+      <p><b>type: </b>({{restaurant.veg_or_nonveg}})</p>
+      <p><b>cuisine </b>({{restaurant.cuisines}})</p>
+      <div class="d-flex">
+      
+    
+      </div>
+      <p class="text-danger">{{restaurant.open_or_close}} - <small class="text-dark">{{restaurant.timings}}</small> Today</p>
+
+</div>
+<div class="container">
+    <div class="d-flex">
+        <div class="m-2">
+            {% if bookmarked %}
+            <button class="btn btn-outline-primary">
+
+                Bookmarked
+            </button>
+          {% else %}
+            <form action="{% url 'restaurantapp:bookmark_adds' restaurant.id %}" method="post">
+              {% csrf_token %}
+              <button type="submit">Bookmark</button>
+            </form>
+          {% endif %}
+        </div>
+        <div class="m-2">
+            {% if visited %}
+            <button class="btn btn-outline-primary">
+
+               Visited
+            </button>
+{% else %}
+    <form action="{% url 'restaurantapp:mark_visited' restaurant.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Mark Visited</button>
+    </form>
+{% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <hr>
+
+    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Dishes</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Profile</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#pills-contact" type="button" role="tab" aria-controls="pills-contact" aria-selected="false">Contact</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#pills-contact" type="button" role="tab" aria-controls="pills-contact" aria-selected="false" >Disabled</button>
+        </li>
+      </ul>
+      <div class="tab-content" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab" tabindex="0">
+            <div class="container">
+    
+                {% include 'dishes.html' %}
+            </div>
+        </div>
+        <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab" tabindex="0">
+            <div class="container">
+                {% include 'resturant_photos.html' %}
+            </div>
+        </div>
+        <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab" tabindex="0">
+            <div class="container">
+                {% include 'review.html' %}
+            </div>
+        </div>
+        <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab" tabindex="0">
+            {% include 'add_review.html' %}
+        </div>
+      </div>
+</div>
+
+
+
+
+
+
+
+  
+{% endblock content %}
+    

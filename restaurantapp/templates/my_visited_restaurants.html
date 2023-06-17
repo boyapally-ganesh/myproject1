@@ -1,0 +1,34 @@
+{% extends 'main.html' %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h1>My Visited Restaurants</h1>
+    {% if visited_restaurants %}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Restaurant</th>
+            <th>Image</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for visited_restaurant in visited_restaurants %}
+            <tr>
+              <td>{{ visited_restaurant.title }}</td>
+              <td><img src="{{ visited_restaurant.restaurant_photo_home.url }}" alt="Restaurant Photo" width="100"></td>
+              <td>
+                <form action="{% url 'restaurantapp:delete_visited_restaurant' visited_restaurant.id %}" method="post">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>You have no visited restaurants.</p>
+    {% endif %}
+  </div>
+{% endblock content %}

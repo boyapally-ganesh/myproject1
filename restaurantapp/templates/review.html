@@ -1,0 +1,25 @@
+<!-- restaurant_detail.html -->
+<!-- Rest of the template code... -->
+
+<!-- Display reviews -->
+{% for review in reviews %}
+    <div class="review">
+        <h3>{{ review.user }}</h3>
+        <p>{{ review.text }}</p>
+        <p>Rating: {{ review.rating }}</p>
+    </div>
+    {% if review.user == request.user %}
+    <form method="post" action="{% url 'restaurantapp:delete_review' slug=restaurant.slug|slugify review_id=review.id %}?next={{ request.path }} %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete Review</button>
+    </form>
+{% else %}
+    <p>This review was created by another user.</p>
+{% endif %}
+ 
+{% endfor %}
+
+<!-- Add a new review -->
+
+
+<!-- Rest of the template code... -->

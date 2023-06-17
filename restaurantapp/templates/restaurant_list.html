@@ -1,0 +1,265 @@
+{% extends 'main.html' %}
+
+{% block navbar %}
+    
+{% endblock navbar %}
+    
+{% block content %}
+    
+{% load static %}
+<html>
+<head>
+    <style>
+        .body{
+            font-family: sans-serif;
+        }
+        .card-img-poster{
+            height: 500px;
+        }
+        .card-title-big{
+            color: white;
+            font-weight: 800;
+            font-size: 70px;
+        }
+        .nav-link{
+            color: white;
+        }
+        .card-text-small{
+            font-weight: 500;
+            font-size: 50px;
+        }
+        .resturant-image{
+            height: 250px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card text-bg-dark threehundred">
+        <img src="{% static 'images\posterimage.webp' %}" class="card-img card-img-poster" alt="...">
+        <div class="card-img-overlay">
+            <nav class="navbar navbar-expand-lg navbar-transparent">
+                <div class="container-fluid">
+                  <a class="navbar-brand" href="#"><h2 class="text-light">zomato</h2></a>
+                  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                  </button>
+                  <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        {% if user.is_authenticated %} <!-- Add 'ms-auto' class here -->
+                        <li class="nav-item">
+                          <a class="nav-link active" href="{% url 'restaurantapp:bookmarks' %}">Bookmark</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link active" href="{% url 'restaurantapp:my_visited_restaurants' %}">Visited</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link active" href="{% url 'restaurantapp:logout' %}">Logout</a>
+                        </li>
+                        {% else %}
+                        <li class="nav-item">
+                          <a class="nav-link active" href="{% url 'restaurantapp:login' %}">Login</a>
+                        </li>
+                        {% endif %}
+                   
+                    </ul>
+                  </div>
+                </div>
+              </nav> 
+           <div class="card-body">
+            <h5 class="card-title text-center h1 card-title-big">zomato</h5>
+            <p class="card-text text-center card-text-small">Discover the best food & drinks in Hyderabad</p>
+           </div>
+        </div>
+      </div>
+      <div class="container mt-3">
+        <div class="row">
+            <div class="col">
+
+                <label for="location">Location:</label>
+                <select id="location" class="form-select" name="location">
+                    <option value="">All</option>
+                    <option value="Hyderabad">Hyderabad</option>
+                    <option value="Bangalore">Bangalore</option>
+                    <option value="Chennai">Chennai</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Mumbai">Mumbai</option>
+                </select>
+            </div>
+            <div class="col">
+
+                <label for="veg-or-nonveg">Veg or Non-Veg:</label>
+                <select id="veg-or-nonveg" class="form-select" name="veg_or_nonveg">
+                    <option value="">All</option>
+                    <option value="Veg">Veg</option>
+                    <option value="Non Veg">Non Veg</option>
+                    <option value="Vegan">Vegan</option>
+                </select>
+            </div>
+            <div class="col">
+
+                <label for="cuisines">Cuisines:</label>
+                <select id="cuisines" class="form-select" name="cuisines">
+                    <option value="Fast Food">Fast Food</option>
+                    <option value="Gujarati">Gujarati</option>
+                    <option value="Hyderabadi">Hyderabadi</option>
+                    <option value="Chinese">Chinese</option>
+                </select>
+            </div>
+            <div class="col">
+
+                <label for="open-or-close">Open or Close:</label>
+                <select id="open-or-close" class="form-select" name="open_or_close">
+                    <option value="">All</option>
+                    <option value="open">Open</option>
+                    <option value="close">Close</option>
+                </select>
+            </div>
+        </div>
+      </div>
+
+
+
+
+       
+      </div>
+      
+       
+      <div class="container">
+          <h1>Restaurant List</h1>
+          <div class="container">
+            <div class="row">
+                <button id="sort-cost-asc">Sort by Cost (Low to High)</button>
+                <button id="sort-cost-desc">Sort by Cost (High to Low)</button>
+                <button id="sort-rating-desc">Sort by Rating (High to Low)</button>
+                <button id="sort-rating-asc">Sort by Rating (Low to High)</button>
+                <button id="show-all">Show All Items</button>
+            </div>
+        </div>
+      </div>
+    
+      <ul class="restaurant-list">
+        <div class="container">
+            <div class="row">
+                {% for restaurant in restaurants %}
+                <div class="col g-2 restaurant-card" data-cost="{{ restaurant.cost_for_two }}" data-rating="{{ restaurant.rating }}" data-veg="{{ restaurant.veg_or_nonveg }}" data-cuisine="{{ restaurant.cuisine }}" data-status="{{ restaurant.open_or_close }}" data-city="{{ restaurant.city }}">
+                    <a href="{% url 'restaurantapp:restaurant_detail' restaurant.slug %}" class="text-decoration-none">
+                        <div class="card" style="width: 18rem;">
+                            <img src="{{ restaurant.restaurant_photo_home.url }}" class="card-img-top" alt="Restaurant Photo">
+                            <div class="card-body d-flex justify-content-between">
+                                <h5 class="card-title text-dark">{{ restaurant.title }}</h5>
+                                <p class="card-text"><span class="badge text-bg-success">{{ restaurant.rating }}</span></p>
+                            </div>
+                            <div class="card-body d-flex justify-content-between">
+                                <div class="cuisine">{{ restaurant.cuisines }}</div>
+                                <div class="cost_for_two"><i class="fa-solid fa-indian-rupee-sign"></i>{{ restaurant.cost_for_two }} for two</div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </ul>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    // Function to sort restaurants by cost for two (ascending order)
+    $('#sort-cost-asc').click(function() {
+      var restaurants = $('.restaurant-card');
+      restaurants.sort(function(a, b) {
+        var costA = parseInt($(a).data('cost'));
+        var costB = parseInt($(b).data('cost'));
+        return costA - costB;
+      });
+      $('.restaurant-list').html(restaurants);
+    });
+
+    $("#show-all").click(function() {
+                var restaurantCards = $(".restaurant-card");
+                $(".restaurant-list").html(restaurantCards);
+     });
+
+    // Function to sort restaurants by cost for two (descending order)
+    $('#sort-cost-desc').click(function() {
+      var restaurants = $('.restaurant-card');
+      restaurants.sort(function(a, b) {
+        var costA = parseInt($(a).data('cost'));
+        var costB = parseInt($(b).data('cost'));
+        return costB - costA;
+      });
+      $('.restaurant-list').html(restaurants);
+    });
+
+    // Function to sort restaurants by rating (descending order)
+    $('#sort-rating-desc').click(function() {
+      var restaurants = $('.restaurant-card');
+      restaurants.sort(function(a, b) {
+        var ratingA = parseFloat($(a).data('rating'));
+        var ratingB = parseFloat($(b).data('rating'));
+        return ratingB - ratingA;
+      });
+      $('.restaurant-list').html(restaurants);
+    });
+
+    // Function to sort restaurants by rating (ascending order)
+    $('#sort-rating-asc').click(function() {
+      var restaurants = $('.restaurant-card');
+      restaurants.sort(function(a, b) {
+        var ratingA = parseFloat($(a).data('rating'));
+        var ratingB = parseFloat($(b).data('rating'));
+        return ratingA - ratingB;
+      });
+      $('.restaurant-list').html(restaurants);
+    });
+    
+    
+    // Filter by City
+    $("#city-filter").change(function() {
+        var selectedCity = $(this).val();
+        if (selectedCity !== "") {
+            $(".restaurant-card").hide();
+            $(".restaurant-card[data-city='" + selectedCity + "']").show();
+        } else {
+            $(".restaurant-card").show();
+        }
+    });
+
+    // Filter by Veg or Non-Veg
+    $("#veg-or-nonveg").change(function() {
+        var selectedVeg = $(this).val();
+        if (selectedVeg !== "") {
+            $(".restaurant-card").hide();
+            $(".restaurant-card[data-veg='" + selectedVeg + "']").show();
+        } else {
+            $(".restaurant-card").show();
+        }
+    });
+
+    // Filter by Cuisine
+    $("#cuisines").change(function() {
+        var selectedCuisines = $(this).val();
+        if (selectedCuisines.length > 0) {
+            $(".restaurant-card").hide();
+            for (var i = 0; i < selectedCuisines.length; i++) {
+                $(".restaurant-card[data-cuisine='" + selectedCuisines[i] + "']").show();
+            }
+        } else {
+            $(".restaurant-card").show();
+        }
+    });
+
+    // Filter by Open or Close
+    $("#open-or-close").change(function() {
+        var selectedStatus = $(this).val();
+        if (selectedStatus !== "") {
+            $(".restaurant-card").hide();
+            $(".restaurant-card[data-status='" + selectedStatus + "']").show();
+        } else {
+            $(".restaurant-card").show();
+        }
+    });
+});
+</script>
+</body>
+</html>
+{% endblock content %}

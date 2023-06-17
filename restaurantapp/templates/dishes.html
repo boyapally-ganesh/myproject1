@@ -1,0 +1,27 @@
+<!-- Rest of the restaurant details HTML -->
+<style>
+ .dish_photo{
+    width: 200px;
+ }
+</style>
+<!-- Display the dishes -->
+{% for dish in dishes %}
+    <div class="card mb-3">
+        <div class="row g-0">
+            <div class="col-md-4">
+                <img src="{{ dish.photo.url }}" alt="Dish Photo" class="img-fluid dish_photo">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">{{ dish.name }}</h5>
+                    <p class="card-text">Price: {{ dish.price }}</p>
+                    <p class="card-text">Type: {{ dish.veg_or_nonveg }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% empty %}
+    <p>No dishes available.</p>
+{% endfor %}
+
+<!-- Rest of the restaurant details HTML -->
