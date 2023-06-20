@@ -3,23 +3,40 @@
 
 <!-- Display reviews -->
 {% for review in reviews %}
-    <div class="review">
-        <h3>{{ review.user }}</h3>
-        <p>{{ review.text }}</p>
-        <p>Rating: {{ review.rating }}</p>
-    </div>
-    {% if review.user == request.user %}
-    <form method="post" action="{% url 'restaurantapp:delete_review' slug=restaurant.slug|slugify review_id=review.id %}?next={{ request.path }} %}">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Delete Review</button>
-    </form>
-{% else %}
-    <p>This review was created by another user.</p>
-{% endif %}
+    
+    {% if review %}  
+          <div class="review">
+               <h3>{{ review.user }}</h3>
+               <p>{{ review.text }}</p>
+               <p>Rating: {{ review.rating }}</p>
+          </div>
+         {% if review.user == request.user %}
+                 <form method="post" action="{% url 'restaurantapp:delete_review' slug=restaurant.slug|slugify review_id=review.id %}?next={{ request.path }} %}">
+                 {% csrf_token %}
+                 <button type="submit" class="btn btn-danger">Delete Review</button>
+                 </form>
+         {% else %}
+               <h2 class="">This review was created by another user.</h2>
+         {% endif %}
+    {% else %}
+    <h2 class="h2">No review</h2>
+   {% endif %}
  
 {% endfor %}
 
+
 <!-- Add a new review -->
 
-
+<form method="post" action="{% url 'restaurantapp:add_review' slug=restaurant.slug %}">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="text">Review Text:</label>
+        <textarea class="form-control" id="text" name="text" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+        <label for="rating">Rating:</label>
+        <input type="number" class="form-control" id="rating" name="rating" min="1" max="5" step="0.1">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Review</button>
+</form>
 <!-- Rest of the template code... -->
