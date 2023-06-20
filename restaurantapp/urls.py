@@ -1,12 +1,9 @@
 
-
 from django.urls import path
 from . import views
 from . import consumers
 
 app_name = 'restaurantapp'
-
-
 
 urlpatterns = [
     path('restaurants/', views.restaurant_list, name='restaurant_list'),
@@ -20,7 +17,7 @@ urlpatterns = [
     path('delete-visited-restaurant/<int:restaurant_id>/', views.delete_visited_restaurant, name='delete_visited_restaurant'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
-    path('restaurants/<slug:slug>/add-review/', views.add_review, name='add_reviews'),
+    path('restaurants/<str:slug>/add-review/', views.add_review, name='add_review'),
     path('restaurants/<slug:slug>/delete-review/<int:review_id>/', views.delete_review, name='delete_review'),
 
 
