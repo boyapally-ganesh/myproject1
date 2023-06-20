@@ -18,7 +18,13 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('restaurants/<str:slug>/add-review/', views.add_review, name='add_review'),
-    path('restaurants/<slug:slug>/delete-review/<int:review_id>/', views.delete_review, name='delete_review'),
+    # path('restaurants/<str:slug>/review/<int:review_id>/', views.add_review, name='edit_review'),
+    # .........
+    # path('restaurants/<slug:slug>/delete-review/<int:review_id>/', views.delete_review, name='delete_review'),
+    #......
+    # path('restaurants/<str:slug>/edit-review/<int:review_id>/', views.edit_review, name='edit_review')
+    path('update-review/', views.update_review, name='update_review'),
+    path('delete-review/', views.delete_review, name='delete_review')
 
 
 ]
