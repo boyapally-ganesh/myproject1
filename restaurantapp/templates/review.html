@@ -3,40 +3,140 @@
 
 <!-- Display reviews -->
 {% for review in reviews %}
-    
-    {% if review %}  
-          <div class="review">
-               <h3>{{ review.user }}</h3>
-               <p>{{ review.text }}</p>
-               <p>Rating: {{ review.rating }}</p>
-          </div>
-         {% if review.user == request.user %}
-                 <form method="post" action="{% url 'restaurantapp:delete_review' slug=restaurant.slug|slugify review_id=review.id %}?next={{ request.path }} %}">
-                 {% csrf_token %}
-                 <button type="submit" class="btn btn-danger">Delete Review</button>
-                 </form>
-         {% else %}
-               <h2 class="">This review was created by another user.</h2>
-         {% endif %}
+    {% if review %}
+        <div class="review">
+            <h3>{{ review.user }}</h3>
+            <p>{{ review.text }}</p>
+            <p>Rating: {{ review.rating }}</p>
+            
+            {% if review.user == request.user %}
+                <button type="button" class="btn btn-primary edit-review" data-review-id="{{ review.id }}">Edit Review</button>
+                <button type="button" class="btn btn-danger delete-review" data-review-id="{{ review.id }}">Delete Review</button>
+            {% endif %}
+        </div>
     {% else %}
-    <h2 class="h2">No review</h2>
-   {% endif %}
- 
+        <h2 class="h2">No review</h2>
+    {% endif %}
 {% endfor %}
+
 
 
 <!-- Add a new review -->
 
-<form method="post" action="{% url 'restaurantapp:add_review' slug=restaurant.slug %}">
+<form method="post" {% if review %}action="{% url 'restaurantapp:edit_review' slug=restaurant.slug|slugify review_id=review.id %}"{% else %}action="{% url 'restaurantapp:add_review' slug=restaurant.slug %}"{% endif %}>
     {% csrf_token %}
     <div class="form-group">
         <label for="text">Review Text:</label>
-        <textarea class="form-control" id="text" name="text" rows="3"></textarea>
+        <textarea class="form-control" id="text" name="text" rows="3">{% if review %}{{ review.text }}{% endif %}</textarea>
     </div>
     <div class="form-group">
         <label for="rating">Rating:</label>
-        <input type="number" class="form-control" id="rating" name="rating" min="1" max="5" step="0.1">
+        <input type="number" class="form-control" id="rating" name="rating" min="1" max="5" step="0.1" {% if review %}value="{{ review.rating }}"{% endif %}>
     </div>
-    <button type="submit" class="btn btn-primary">Submit Review</button>
+    <button type="submit" class="btn btn-primary">{% if review %}Update Review{% else %}Submit Review{% endif %}</button>
 </form>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Edit Review
+    $(".edit-review").click(function() {
+        var reviewId = $(this).data("review-id");
+        var reviewText = $(this).siblings("p").first().text();
+        var reviewRating = $(this).siblings("p").last().text().replace("Rating: ", "");
+        
+        // Create an editable form
+        var formHtml = `
+            <form class="edit-review-form" data-review-id="${reviewId}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="text">Review Text:</label>
+                    <textarea class="form-control" id="text" name="text" rows="3">${reviewText}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="rating">Rating:</label>
+                    <input type="number" class="form-control" id="rating" name="rating" min="1" max="5" step="0.1" value="${reviewRating}">
+                </div>
+                <button type="submit" class="btn btn-primary">Update Review</button>
+                <button type="button" class="btn btn-secondary cancel-edit">Cancel</button>
+            </form>
+        `;
+        
+        // Replace the review content with the editable form
+        $(this).closest(".review").html(formHtml);
+    });
+    
+    // Cancel Edit
+    $(document).on("click", ".cancel-edit", function() {
+        var reviewId = $(this).closest(".edit-review-form").data("review-id");
+        var reviewHtml = `
+            <h3>${$(".edit-review-form").siblings("h3").text()}</h3>
+            <p>${$(".edit-review-form textarea").val()}</p>
+            <p>Rating: ${$(".edit-review-form input").val()}</p>
+            <button type="button" class="btn btn-primary edit-review" data-review-id="${reviewId}">Edit Review</button>
+            <button type="button" class="btn btn-danger delete-review" data-review-id="${reviewId}">Delete Review</button>
+        `;
+        $(this).closest(".review").html(reviewHtml);
+    });
+    
+    // Update Review
+    $(document).on("submit", ".edit-review-form", function(e) {
+        e.preventDefault();
+        var reviewId = $(this).data("review-id");
+        var reviewText = $(this).find("textarea").val();
+        var reviewRating = $(this).find("input").val();
+        
+        // Perform AJAX request to update the review
+        $.ajax({
+            type: "POST",
+            url: "{% url 'restaurantapp:update_review' %}",
+            data: {
+                review_id: reviewId,
+                text: reviewText,
+                rating: reviewRating,
+                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val()
+            },
+            success: function(response) {
+                // Update the review content with the updated data
+                var reviewHtml = `
+                    <h3>${response.user}</h3>
+                    <p>${response.text}</p>
+                    <p>Rating: ${response.rating}</p>
+                    <button type="button" class="btn btn-primary edit-review" data-review-id="${reviewId}">Edit Review</button>
+                    <button type="button" class="btn btn-danger delete-review" data-review-id="${reviewId}">Delete Review</button>
+                `;
+                $(".edit-review-form[data-review-id=" + reviewId + "]").closest(".review").html(reviewHtml);
+            },
+            error: function() {
+                alert("Error occurred while updating the review.");
+            }
+        });
+    });
+    
+    // Delete Review
+    $(document).on("click", ".delete-review", function() {
+        var reviewId = $(this).data("review-id");
+        
+        // Perform AJAX request to delete the review
+        $.ajax({
+            type: "POST",
+            url: "{% url 'restaurantapp:delete_review' %}",
+            data: {
+                review_id: reviewId,
+                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val()
+            },
+            success: function() {
+                // Remove the deleted review from the DOM
+                $(".delete-review[data-review-id=" + reviewId + "]").closest(".review").remove();
+            },
+            error: function() {
+                alert("Error occurred while deleting the review.");
+            }
+        });
+    });
+});
+</script>
+
+
 <!-- Rest of the template code... -->
