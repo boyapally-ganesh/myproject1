@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.shortcuts import render, get_object_or_404
 from .forms import ReviewForm
+from decimal import Decimal, InvalidOperation
+from django.core.exceptions import ValidationError
 # Create your views here.
 from django.shortcuts import render
 from .models import Restaurant, Bookmark, VisitedRestaurant, Dish, Photo, Review
@@ -141,26 +143,7 @@ def logout_view(request):
     return redirect('restaurantapp:restaurant_list')
 
 
-# def add_review(request, slug):
-#     restaurant = get_object_or_404(Restaurant, slug=slug)
 
-#     if request.method == 'POST':
-#         form = ReviewForm(request.POST)
-#         if form.is_valid():
-#             review = form.save(commit=False)
-#             review.user = request.user
-#             review.restaurant = restaurant
-#             review.save()
-#             return redirect('restaurant_detail', slug=slug)
-#     else:
-#         form = ReviewForm()
-
-#     context = {
-#         'form': form,
-#         'restaurant': restaurant,
-#     }
-
-#     return render(request, 'add_review.html', context)
 def add_review(request, slug):
     restaurant = get_object_or_404(Restaurant, slug=slug)
 
@@ -181,24 +164,104 @@ def add_review(request, slug):
     }
     # return redirect('restaurantapp:restaurant_detail', slug=slug)
     return render(request, 'review.html', context)
+# def add_review(request, slug, review_id=None):
+#     restaurant = get_object_or_404(Restaurant, slug=slug)
+#     review = None
+
+#     if review_id:
+#         review = get_object_or_404(Review, id=review_id)
+
+#     if request.method == 'POST':
+#         form = ReviewForm(request.POST, instance=review)
+#         if form.is_valid():
+#             review = form.save(commit=False)
+#             review.user = request.user
+#             review.restaurant = restaurant
+#             review.save()
+#             return redirect('restaurantapp:restaurant_detail', slug=slug)
+#     else:
+#         form = ReviewForm(instance=review)
+
+#     context = {
+#         'form': form,
+#         'restaurant': restaurant,
+#         'review': review,
+#     }
+
+#     return render(request, 'add_review.html', context)
 
 
 @login_required
-def delete_review(request, slug, review_id):
-    # Retrieve the review object
-    review = get_object_or_404(Review, id=review_id)
+# def delete_review(request, slug, review_id):
+#     # Retrieve the review object
+#     review = get_object_or_404(Review, id=review_id)
 
-    # Check if the logged-in user is the owner of the review
-    if review.user != request.user:
-        # User is not the owner, return an error response or redirect to an appropriate page
-        # For example, you can redirect back to the restaurant detail page
-        return redirect('restaurantapp:restaurant_detail', slug=slug)
+#     # Check if the logged-in user is the owner of the review
+#     if review.user != request.user:
+#         # User is not the owner, return an error response or redirect to an appropriate page
+#         # For example, you can redirect back to the restaurant detail page
+#         return redirect('restaurantapp:restaurant_detail', slug=slug)
 
-    # Get the restaurant associated with the review
-    restaurant = review.restaurant
+#     # Get the restaurant associated with the review
+#     restaurant = review.restaurant
 
-    # Delete the review
-    review.delete()
+#     # Delete the review
+#     review.delete()
 
-    # Redirect to the restaurant detail page
-    return redirect('restaurantapp:restaurant_detail', slug=restaurant.slug)
+#     # Redirect to the restaurant detail page
+#     return redirect('restaurantapp:restaurant_detail', slug=restaurant.slug)
+def update_review(request):
+    if request.method == 'POST' and request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+        review_id = request.POST.get('review_id')
+        text = request.POST.get('text')
+        rating = request.POST.get('rating')
+        
+        # Get the review object
+        try:
+            review = Review.objects.get(id=review_id)
+        except Review.DoesNotExist:
+            return JsonResponse({'error': 'Review not found'}, status=404)
+        
+        # Update the review fields
+        review.text = text
+        
+        # Validate and update the rating field
+        try:
+            review.rating = float(rating)
+            review.full_clean()  # Run model validation
+            review.save()  # Save the updated review
+        except (ValueError, ValidationError):
+            return JsonResponse({'error': 'Invalid rating value.'}, status=400)
+        
+        # Return the updated review data as JSON response
+        response = {
+            'user': review.user.username,
+            'text': review.text,
+            'rating': str(review.rating),
+        }
+        return JsonResponse(response)
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def delete_review(request):
+    if request.method == 'POST' and request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+        review_id = request.POST.get('review_id')
+        review = get_object_or_404(Review, id=review_id)
+        
+        # Mark the review as deleted
+  
+        
+        # Delete the review
+        review.delete()
+        
+        # Perform the delete operation
+        # Replace this code with your actual logic to delete the review
+        
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'error': 'Invalid request'})
+
+
+
+
+
